@@ -1,0 +1,33 @@
+name: List (files) by glob
+description: List (files) by glob
+inputs:
+  glob:
+    description: Glob to list
+    required: true
+outputs:
+  fullPaths:
+    description: fullPaths
+    value: ${{ steps.glob.outputs.fullPaths }}
+  baseNames:
+    description: baseNames
+    value: ${{ steps.glob.outputs.baseNames }}
+runs:
+  using: composite
+  steps:
+    - uses: actions/github-script@v6
+      id: glob
+      with:
+        result-encoding: string
+        script: |
+          const path = require('path');
+          const inputsGlob = `${{ inputs.glob }}`;
+          console.log('inputs.glob', inputsGlob);
+          const globber = await glob.create(inputsGlob, {followSymbolicLinks: false});
+
+          const fullPaths = await globber.glob();
+          console.log('fullPaths\n', fullPaths.join('\n'));
+          core.setOutput("fullPaths", JSON.stringify(fullPaths));
+
+          const baseNames = fullPaths.map(f => path.basename(f));
+          console.log('baseNames\n', baseNames.join('\n'));
+          core.setOutput("baseNames", JSON.stringify(baseNames));

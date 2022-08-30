@@ -22,7 +22,10 @@ runs:
           const path = require('path');
           const inputsGlob = `${{ inputs.glob }}`;
           console.log('inputs.glob', inputsGlob);
-          const globber = await glob.create(inputsGlob, {followSymbolicLinks: false});
+          const globber = await glob.create(inputsGlob, {
+            followSymbolicLinks: false,
+            implicitDescendants: false,
+          });
 
           const fullPaths = await globber.glob();
           console.log('fullPaths\n', fullPaths.join('\n'));
